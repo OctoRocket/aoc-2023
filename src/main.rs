@@ -30,12 +30,14 @@ mod second {
         InvalidColorType(String),
     }
 
+    #[derive(Debug)]
     struct Set {
         red: u32,
         green: u32,
         blue: u32,
     }
 
+    #[derive(Debug)]
     struct Game {
         id: u32,
         sets: Vec<Set>,
@@ -84,7 +86,7 @@ mod second {
 
         let game_id = id_scan
             .find(full_scan.find_iter(input)
-                .nth(1)
+                .nth(0)
                 .ok_or(SecondError::ParseGame)?
                 .as_str())
             .ok_or(SecondError::GameTag)?
