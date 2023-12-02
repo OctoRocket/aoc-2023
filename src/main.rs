@@ -44,7 +44,7 @@ mod second {
     }
 
     fn parse_to_set(input: &str) -> Result<Set> {
-        let seperator = Regex::new(r"\d [^,]+")?;
+        let seperator = Regex::new(r"\d+ [^,]+")?;
 
         let blocks = seperator
             .find_iter(input)
@@ -80,13 +80,13 @@ mod second {
     }
 
     fn parse_to_game(input: &str) -> Result<Game> {
-        let full_scan = Regex::new(r"Game \d|\d+ \w+")?;
+        let full_scan = Regex::new(r"Game \d+|\d+ \w+")?;
         let id_scan = Regex::new(r"\d+")?;
         let set_scan = Regex::new(r"\d+ [^;]+")?;
 
         let game_id = id_scan
             .find(full_scan.find_iter(input)
-                .nth(0)
+                .next()
                 .ok_or(SecondError::ParseGame)?
                 .as_str())
             .ok_or(SecondError::GameTag)?
@@ -106,11 +106,17 @@ mod second {
         let mut possible = Vec::new();
 
         for game in input {
-            let mut success = false;
+            let mut success = true;
 
             for set in &game.sets {
-                if set.red < available_colors.0 && set.green < available_colors.1 && set.blue < available_colors.2 {
-                    success = true;
+                let results = (
+                    set.red <= available_colors.0,
+                    set.green <= available_colors.1,
+                    set.blue <= available_colors.2,
+                );
+
+                if !results.0 || !results.1 || !results.2 {
+                    success = false;
                 }
             }
 
@@ -130,7 +136,9 @@ mod second {
             games.push(parse_to_game(line)?);
         }
 
-        for game in possible_games(games, available_colors) {
+        let validated_games = possible_games(games, available_colors);
+
+        for game in validated_games {
             sum += game.id;
         }
 
