@@ -144,6 +144,33 @@ mod second {
 
         Ok(sum)
     }
+
+    fn minimum_colors(game: Game) -> (u32, u32, u32) {
+        let mut maximums = (0, 0, 0);
+
+        for set in game.sets {
+            if set.red   > maximums.0 { maximums.0 = set.red;   }
+            if set.green > maximums.1 { maximums.1 = set.green; }
+            if set.blue  > maximums.2 { maximums.2 = set.blue;  }
+        }
+
+        maximums
+    }
+
+    pub fn second(input: &str) -> Result<u32> {
+        let mut games = Vec::new();
+        for line in input.split('\n') {
+            games.push(parse_to_game(line)?);
+        }
+
+        let mut powers = Vec::new();
+        for game in games {
+            let minimums = minimum_colors(game);
+            powers.push(minimums.0 * minimums.1 * minimums.2);
+        }
+
+        Ok(powers.iter().sum())
+    }
 }
 
 fn main() -> Result<()> {
@@ -151,7 +178,7 @@ fn main() -> Result<()> {
     let mut buf = String::new();
     file.read_to_string(&mut buf)?;
 
-    println!("{:?}", second::first(&buf, (12, 13, 14))?);
+    println!("{:?}", second::second(&buf)?);
 
     Ok(())
 }
