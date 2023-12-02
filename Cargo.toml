@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
+regex = "1.10.2"
+thiserror = "1.0.50"
