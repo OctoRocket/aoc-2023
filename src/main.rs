@@ -14,7 +14,7 @@ fn main() -> Result<()> {
     let mut buf = String::new();
     file.read_to_string(&mut buf)?;
 
-    println!("{:?}", forth::first(&buf)?);
+    println!("{:?}", forth::second(&buf)?);
 
     Ok(())
 }

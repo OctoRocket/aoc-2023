@@ -87,7 +87,7 @@ fn grab_cards_by_id(id: usize, cards: Vec<Card>) -> Option<Card> {
     cards.into_iter().find(|i| i.id == id)
 }
 
-pub fn first(input: &str) -> Result<u32> {
+pub fn second(input: &str) -> Result<u32> {
     let mut cards = generate_cards(input)?;
 
     let mut total_cards = 0;
