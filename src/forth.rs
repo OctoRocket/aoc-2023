@@ -90,8 +90,6 @@ pub fn second(input: &str) -> Result<usize> {
     let mut card_numbers = vec![1; card_scores.len()];
     card_numbers.fill(1);
 
-    dbg!(&card_numbers, &card_scores);
-
     for index in 0..card_scores.len() {
         for i in 1..=card_scores[index] {
             if card_numbers.get(index + i).is_some() {
