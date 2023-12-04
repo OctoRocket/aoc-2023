@@ -97,8 +97,6 @@ pub fn first(input: &str) -> Result<u32> {
     let mut total_cards = 0;
     let mut cards_left = cards.len();
     while cards_left > 0 {
-        print_ids(&cards);
-
         let card = &cards[0];
         let score = score(card);
         let current_id = card.id;
