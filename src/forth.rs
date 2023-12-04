@@ -14,8 +14,7 @@ enum ForthError {
 #[derive(Debug, Clone)]
 struct Card {
     id: usize,
-    winning_values: Vec<u32>,
-    owned_values: Vec<u32>,
+    score: usize,
 }
 
 fn generate_cards(input: &str) -> Result<Vec<Card>> {
@@ -46,7 +45,7 @@ fn generate_cards(input: &str) -> Result<Vec<Card>> {
                 .as_str()
             )
             .map(|n| n.as_str().parse().unwrap())
-            .collect();
+            .collect::<Vec<u32>>();
 
         let owned_values = value_scan.find_iter(
             split_scan
@@ -56,26 +55,23 @@ fn generate_cards(input: &str) -> Result<Vec<Card>> {
                 .as_str()
             )
             .map(|n| n.as_str().parse().unwrap())
-            .collect();
+            .collect::<Vec<u32>>();
+
+        let score = owned_values
+            .iter()
+            .filter(|n| winning_values.contains(n))
+            .collect::<Vec<&u32>>()
+            .len();
 
         cards.push(
             Card {
                 id,
-                winning_values,
-                owned_values,
+                score,
             }
         );
     }
 
     Ok(cards)
-}
-
-fn score(card: &Card) -> usize {
-    card.owned_values
-            .iter()
-            .filter(|n| card.winning_values.contains(n))
-            .collect::<Vec<&u32>>()
-            .len()
 }
 
 #[allow(dead_code)]
@@ -96,10 +92,16 @@ pub fn first(input: &str) -> Result<u32> {
 
     let mut total_cards = 0;
     let mut cards_left = cards.len();
+    let mut prev_id = 0;
     while cards_left > 0 {
         let card = &cards[0];
-        let score = score(card);
+        let score = card.score;
         let current_id = card.id;
+
+        if current_id != prev_id {
+            println!("{current_id}");
+            prev_id = current_id;
+        }
 
         let mut copied_cards = vec![];
         for id in 1..=score {
