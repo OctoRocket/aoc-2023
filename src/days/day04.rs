@@ -3,6 +3,7 @@ use std::vec;
 use anyhow::Result;
 use regex::Regex;
 use thiserror::Error;
+use aoc_runner_derive::*;
 
 #[derive(Debug, Error)]
 enum ForthError {
@@ -59,6 +60,12 @@ fn generate_cards(input: &str) -> Result<Vec<usize>> {
     Ok(scores)
 }
 
+#[aoc(day4, part1)]
+pub fn first(input: &str) -> Result<usize> {
+    Ok(generate_cards(input)?.iter().sum())
+}
+
+#[aoc(day4, part2)]
 pub fn second(input: &str) -> Result<usize> {
     let card_scores = generate_cards(input)?;
     let mut card_numbers = vec![1; card_scores.len()];
