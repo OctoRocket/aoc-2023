@@ -83,12 +83,9 @@ fn sort_by_ids(cards: &mut [Card]) {
     cards.sort_unstable_by(|c1, c2| c1.id.cmp(&c2.id));
 }
 
-fn grab_cards_by_id(id: usize, cards: Vec<Card>) -> Option<Card> {
-    cards.into_iter().find(|i| i.id == id)
-}
-
 pub fn second(input: &str) -> Result<u32> {
     let mut cards = generate_cards(input)?;
+    let originals = cards.clone();
 
     let mut total_cards = 0;
     let mut cards_left = cards.len();
@@ -105,9 +102,7 @@ pub fn second(input: &str) -> Result<u32> {
 
         let mut copied_cards = vec![];
         for id in 1..=score {
-            if let Some(copy) = grab_cards_by_id(current_id + id, cards.clone()) {
-                copied_cards.push(copy);
-            }
+            copied_cards.push(originals[current_id + id  - 1].clone());
         }
 
         cards.remove(0);
