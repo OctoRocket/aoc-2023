@@ -7,14 +7,14 @@ use std::{
 };
 use anyhow::Result;
 
-mod second;
+mod third;
 
 fn main() -> Result<()> {
     let mut file = File::open("input.txt")?;
     let mut buf = String::new();
     file.read_to_string(&mut buf)?;
 
-    println!("{:?}", second::second(&buf)?);
+    println!("{:?}", third::first(&buf)?);
 
     Ok(())
 }
