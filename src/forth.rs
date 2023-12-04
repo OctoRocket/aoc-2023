@@ -18,7 +18,7 @@ fn generate_cards(input: &str) -> Result<Vec<usize>> {
     let split_scan = Regex::new(r"[^|]+")?;
     let value_scan = Regex::new(r"\d+")?;
 
-    let mut cards = vec![];
+    let mut scores = vec![];
 
     for line in input.split('\n') {
 
@@ -53,10 +53,10 @@ fn generate_cards(input: &str) -> Result<Vec<usize>> {
             .collect::<Vec<&u32>>()
             .len();
 
-        cards.push(score);
+        scores.push(score);
     }
 
-    Ok(cards)
+    Ok(scores)
 }
 
 pub fn second(input: &str) -> Result<usize> {
