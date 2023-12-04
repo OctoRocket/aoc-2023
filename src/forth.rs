@@ -1,3 +1,5 @@
+use std::vec;
+
 use anyhow::Result;
 use regex::Regex;
 use thiserror::Error;
@@ -83,39 +85,20 @@ fn sort_by_ids(cards: &mut [Card]) {
     cards.sort_unstable_by(|c1, c2| c1.id.cmp(&c2.id));
 }
 
-pub fn second(input: &str) -> Result<u32> {
-    let mut cards = generate_cards(input)?;
-    let originals = cards.clone();
+pub fn second(input: &str) -> Result<usize> {
+    let card_scores = generate_cards(input)?.iter().map(|c| c.score).collect::<Vec<usize>>();
+    let mut card_numbers = vec![1; card_scores.len()];
+    card_numbers.fill(1);
 
-    let mut total_cards = 0;
-    let mut cards_left = cards.len();
-    let mut prev_id = 0;
-    while cards_left > 0 {
-        let card = &cards[0];
-        let score = card.score;
-        let current_id = card.id;
+    dbg!(&card_numbers, &card_scores);
 
-        if current_id != prev_id {
-            println!("{current_id}");
-            prev_id = current_id;
+    for index in 0..card_scores.len() {
+        for i in 1..=card_scores[index] {
+            if card_numbers.get(index + i).is_some() {
+                card_numbers[index + i] += card_numbers[index];
+            }
         }
-
-        let mut copied_cards = vec![];
-        for id in 1..=score {
-            copied_cards.push(originals[current_id + id  - 1].clone());
-        }
-
-        cards.remove(0);
-        cards_left -= 1;
-
-        copied_cards.append(&mut cards);
-        cards = copied_cards;
-        cards_left += score;
-
-        total_cards += 1;
-
-        sort_by_ids(&mut cards);
     }
 
-    Ok(total_cards)
+    Ok(card_numbers.into_iter().sum())
 }
