@@ -13,14 +13,7 @@ enum ForthError {
     NumberError(String),
 }
 
-#[derive(Debug, Clone)]
-struct Card {
-    id: usize,
-    score: usize,
-}
-
-fn generate_cards(input: &str) -> Result<Vec<Card>> {
-    let card_scan = Regex::new(r"\d+")?;
+fn generate_cards(input: &str) -> Result<Vec<usize>> {
     let number_scan = Regex::new(r"[\d\s]+\|[\d\s]+")?;
     let split_scan = Regex::new(r"[^|]+")?;
     let value_scan = Regex::new(r"\d+")?;
@@ -28,11 +21,6 @@ fn generate_cards(input: &str) -> Result<Vec<Card>> {
     let mut cards = vec![];
 
     for line in input.split('\n') {
-        let id = card_scan
-            .find(line)
-            .ok_or(ForthError::IdError(line.to_string()))?
-            .as_str()
-            .parse()?;
 
         let numbers = number_scan
             .find(line)
@@ -65,28 +53,14 @@ fn generate_cards(input: &str) -> Result<Vec<Card>> {
             .collect::<Vec<&u32>>()
             .len();
 
-        cards.push(
-            Card {
-                id,
-                score,
-            }
-        );
+        cards.push(score);
     }
 
     Ok(cards)
 }
 
-#[allow(dead_code)]
-fn print_ids(cards: &[Card]) {
-    println!("{:?}", cards.iter().map(|c| c.id).collect::<Vec<usize>>());
-}
-
-fn sort_by_ids(cards: &mut [Card]) {
-    cards.sort_unstable_by(|c1, c2| c1.id.cmp(&c2.id));
-}
-
 pub fn second(input: &str) -> Result<usize> {
-    let card_scores = generate_cards(input)?.iter().map(|c| c.score).collect::<Vec<usize>>();
+    let card_scores = generate_cards(input)?;
     let mut card_numbers = vec![1; card_scores.len()];
     card_numbers.fill(1);
 
