@@ -3,7 +3,7 @@ use std::vec;
 use anyhow::Result;
 use regex::Regex;
 use thiserror::Error;
-use aoc_runner_derive::*;
+use aoc_runner_derive::aoc;
 
 #[derive(Debug, Error)]
 enum ForthError {
