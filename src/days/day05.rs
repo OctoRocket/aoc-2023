@@ -1,7 +1,10 @@
 use std::{collections::HashMap, num::ParseIntError};
 
 use anyhow::Result;
-use aoc_runner_derive::aoc_generator;
+use aoc_runner_derive::{
+    aoc,
+    aoc_generator,
+};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -40,6 +43,8 @@ fn parse_input(input: &str) -> Result<Almanac> {
 
     let mut maps = vec![];
     for section in &sections[1..sections.len()] {
+        let mut map = HashMap::new();
+
         for parameters in section
             .split(':')
             .nth(1)
@@ -47,7 +52,6 @@ fn parse_input(input: &str) -> Result<Almanac> {
             .split('\n') {
             let map_results: Vec<Result<usize, ParseIntError>> = parameters.split_whitespace().map(str::parse).collect();
             let mut map_vals = vec![];
-            let mut map = HashMap::new();
 
             for result in map_results {
                 map_vals.push(result?)
@@ -57,7 +61,14 @@ fn parse_input(input: &str) -> Result<Almanac> {
                 map.insert(map_vals[0] + i, map_vals[1] + i);
             }
         }
+
+        maps.push(map);
     }
 
-    Ok(Almanac { seeds, maps: vec![] })
+    Ok(Almanac { seeds, maps })
+}
+
+#[aoc(day5, part1)]
+pub fn first(input: Result<Almanac>) -> Almanac {
+    input.unwrap()
 }
