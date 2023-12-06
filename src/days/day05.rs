@@ -31,6 +31,7 @@ pub struct Almanac {
     maps: Vec<Vec<[usize; 3]>>,
 }
 
+#[allow(clippy::needless_range_loop)]
 fn parse_input(input: &str) -> Result<Almanac> {
     let sections = input.split("\n\n").collect::<Vec<&str>>();
     let mut seeds = vec![];
