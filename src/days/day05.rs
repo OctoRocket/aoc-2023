@@ -1,7 +1,8 @@
-use std::{collections::HashMap, num::ParseIntError};
+use std::num::ParseIntError;
 
 use anyhow::Result;
 use thiserror::Error;
+
 
 #[derive(Debug, Error)]
 enum FifthError {
@@ -12,13 +13,19 @@ enum FifthError {
     Seed,
 
     #[error("missing map data")]
-    MapData
+    MapData,
+
+    #[error("no answers")]
+    Answer,
+
+    #[error("line of map is incomplete, line: {0}")]
+    Line(String),
 }
 
 #[derive(Debug, Clone)]
 pub struct Almanac {
     seeds: Vec<usize>,
-    maps: Vec<HashMap<usize, usize>>,
+    maps: Vec<Vec<[usize; 3]>>,
 }
 
 fn parse_input(input: &str) -> Result<Almanac> {
@@ -39,7 +46,7 @@ fn parse_input(input: &str) -> Result<Almanac> {
 
     let mut maps = vec![];
     for section in &sections[1..sections.len()] {
-        let mut map = HashMap::new();
+        let mut map = vec![];
 
         for parameters in section
                 .split(':')
@@ -47,35 +54,44 @@ fn parse_input(input: &str) -> Result<Almanac> {
                 .ok_or(FifthError::MapData)?
                 .split('\n') {
             if !parameters.is_empty() {
-                let map_results: Vec<Result<usize, ParseIntError>> = parameters.split_whitespace().map(str::parse).collect();
-                let mut map_vals = vec![];
+                let mut line = parameters.split_whitespace().map(|s| s.parse().unwrap());
+                let mut line_map = [0; 3];
 
-                for result in map_results {
-                    map_vals.push(result?);
+                for i in 0..=2 {
+                    line_map[i] = line.next().ok_or(FifthError::Line(parameters.to_string()))?;
                 }
 
-                for i in 0..map_vals[2] {
-                    map.insert(map_vals[0] + i, map_vals[1] + i);
-                }
+                map.push(line_map);
             }
         }
-
         maps.push(map);
     }
 
     Ok(Almanac { seeds, maps })
 }
 
+fn map_seed(seed: usize, map: &Vec<[usize; 3]>) -> usize {
+    for submap in map {
+        if (submap[1]..(submap[1] + submap[2])).contains(&seed) {
+            return seed - submap[1] + submap[0];
+        }
+    }
+
+    seed
+}
+
 pub fn first(input: &str) -> Result<usize> {
     let almanac = parse_input(input)?;
+    println!("Almanac generated.");
 
     let mut answers = vec![];
     for mut seed in almanac.seeds {
         for map in &almanac.maps {
-            seed = *map.get(&seed).ok_or(FifthError::Content)?;
+            seed = map_seed(seed, map);
         }
+        println!("{seed}");
         answers.push(seed);
     }
 
-    Ok(*answers.iter().min().ok_or(FifthError::Content)?)
+    Ok(*answers.iter().min().ok_or(FifthError::Answer)?)
 }
