@@ -20,6 +20,9 @@ enum FifthError {
 
     #[error("line of map is incomplete, line: {0}")]
     Line(String),
+
+    #[error("no answers for pair: {0}")]
+    Pair(String),
 }
 
 #[derive(Debug, Clone)]
@@ -91,6 +94,28 @@ pub fn first(input: &str) -> Result<usize> {
         }
         println!("{seed}");
         answers.push(seed);
+    }
+
+    Ok(*answers.iter().min().ok_or(FifthError::Answer)?)
+}
+
+pub fn second(input: &str) -> Result<usize> {
+    let almanac = parse_input(input)?;
+    println!("Almanac generated.");
+
+    let seed_pairs = almanac.seeds.chunks_exact(2).collect::<Vec<&[usize]>>();
+
+    let mut answers = vec![];
+    for seed_pair in seed_pairs {
+        let mut pair_answers = vec![];
+        for mut seed in seed_pair[0]..(seed_pair[0] + seed_pair[1]) {
+            for map in &almanac.maps {
+                seed = map_seed(seed, map);
+            }
+            pair_answers.push(seed);
+        }
+        answers.push(*pair_answers.iter().min().ok_or(FifthError::Pair(format!("{:?}", &seed_pair)))?);
+        println!("Pair complete");
     }
 
     Ok(*answers.iter().min().ok_or(FifthError::Answer)?)
