@@ -1,10 +1,6 @@
 use std::{collections::HashMap, num::ParseIntError};
 
 use anyhow::Result;
-use aoc_runner_derive::{
-    aoc,
-    aoc_generator,
-};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -19,12 +15,12 @@ enum FifthError {
     MapData
 }
 
-struct Almanac {
+#[derive(Debug, Clone)]
+pub struct Almanac {
     seeds: Vec<usize>,
     maps: Vec<HashMap<usize, usize>>,
 }
 
-#[aoc_generator(day5)]
 fn parse_input(input: &str) -> Result<Almanac> {
     let sections = input.split("\n\n").collect::<Vec<&str>>();
     let mut seeds = vec![];
@@ -46,19 +42,21 @@ fn parse_input(input: &str) -> Result<Almanac> {
         let mut map = HashMap::new();
 
         for parameters in section
-            .split(':')
-            .nth(1)
-            .ok_or(FifthError::MapData)?
-            .split('\n') {
-            let map_results: Vec<Result<usize, ParseIntError>> = parameters.split_whitespace().map(str::parse).collect();
-            let mut map_vals = vec![];
+                .split(':')
+                .nth(1)
+                .ok_or(FifthError::MapData)?
+                .split('\n') {
+            if !parameters.is_empty() {
+                let map_results: Vec<Result<usize, ParseIntError>> = parameters.split_whitespace().map(str::parse).collect();
+                let mut map_vals = vec![];
 
-            for result in map_results {
-                map_vals.push(result?)
-            }
+                for result in map_results {
+                    map_vals.push(result?);
+                }
 
-            for i in 0..map_vals[2] {
-                map.insert(map_vals[0] + i, map_vals[1] + i);
+                for i in 0..map_vals[2] {
+                    map.insert(map_vals[0] + i, map_vals[1] + i);
+                }
             }
         }
 
@@ -68,7 +66,16 @@ fn parse_input(input: &str) -> Result<Almanac> {
     Ok(Almanac { seeds, maps })
 }
 
-#[aoc(day5, part1)]
-pub fn first(input: Result<Almanac>) -> Almanac {
-    input.unwrap()
+pub fn first(input: &str) -> Result<usize> {
+    let almanac = parse_input(input)?;
+
+    let mut answers = vec![];
+    for mut seed in almanac.seeds {
+        for map in &almanac.maps {
+            seed = *map.get(&seed).ok_or(FifthError::Content)?;
+        }
+        answers.push(seed);
+    }
+
+    Ok(*answers.iter().min().ok_or(FifthError::Content)?)
 }
