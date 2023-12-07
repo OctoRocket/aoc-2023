@@ -12,11 +12,11 @@ use std::{
 };
 
 fn main() -> Result<()> {
-    let mut file = File::open("input.txt")?;
+    let mut file = File::open("example.txt")?;
     let mut buf = String::new();
     file.read_to_string(&mut buf)?;
 
-    println!("{:?}", days::day06::second(&buf)?);
+    println!("{:?}", days::day07::first(&buf)?);
 
     Ok(())
 }
