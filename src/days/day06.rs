@@ -74,6 +74,5 @@ pub fn first(input: &str) -> Result<usize> {
         total_ways.push(ways);
     }
 
-    dbg!(&total_ways);
     Ok(total_ways.into_iter().reduce(|a, b| a * b).ok_or(SixthError::Distance)?)
 }
