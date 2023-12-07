@@ -81,7 +81,7 @@ pub fn first(input: &str) -> Result<usize> {
     Ok(total_ways.into_iter().reduce(|a, b| a * b).ok_or(SixthError::Distance)?)
 }
 
-fn combine(event: Event) -> Result<Event> {
+fn combine(event: &Event) -> Result<Event> {
     let time = event
         .iter()
         .map(|r| r.time.to_string())
@@ -102,7 +102,7 @@ fn combine(event: Event) -> Result<Event> {
 }
 
 pub fn second(input: &str) -> Result<usize> {
-    let event = combine(parse_times(input)?)?;
+    let event = combine(&parse_times(input)?)?;
 
     let mut total_ways = vec![];
 
