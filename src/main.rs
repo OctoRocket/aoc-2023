@@ -16,7 +16,7 @@ fn main() -> Result<()> {
     let mut buf = String::new();
     file.read_to_string(&mut buf)?;
 
-    println!("{:?}", days::day06::first(&buf)?);
+    println!("{:?}", days::day06::second(&buf)?);
 
     Ok(())
 }

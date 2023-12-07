@@ -10,9 +10,13 @@ enum SixthError {
     Record,
 
     #[error("no distances recorded")]
-    Distance
+    Distance,
+
+    #[error("could not combine times or records")]
+    Combine,
 }
 
+#[derive(Debug)]
 struct Race {
     time: usize,
     record: usize,
@@ -57,6 +61,48 @@ fn parse_times(input: &str) -> Result<Event> {
 
 pub fn first(input: &str) -> Result<usize> {
     let event = parse_times(input)?;
+
+    let mut total_ways = vec![];
+
+    for race in event {
+        let mut ways = 0;
+
+        for t in 0..=race.time {
+            let distance = (race.time - t) * t;
+
+            if distance > race.record {
+                ways += 1;
+            }
+        }
+
+        total_ways.push(ways);
+    }
+
+    Ok(total_ways.into_iter().reduce(|a, b| a * b).ok_or(SixthError::Distance)?)
+}
+
+fn combine(event: Event) -> Result<Event> {
+    let time = event
+        .iter()
+        .map(|r| r.time.to_string())
+        .reduce(|s1, s2| s1 + &s2)
+        .ok_or(SixthError::Combine)?
+        .parse()?;
+    let record = event
+        .iter()
+        .map(|r| r.record.to_string())
+        .reduce(|s1, s2| s1 + &s2)
+        .ok_or(SixthError::Combine)?
+        .parse()?;
+
+    Ok(vec![Race {
+        time,
+        record,
+    }])
+}
+
+pub fn second(input: &str) -> Result<usize> {
+    let event = combine(parse_times(input)?)?;
 
     let mut total_ways = vec![];
 
