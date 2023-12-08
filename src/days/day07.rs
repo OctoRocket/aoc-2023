@@ -17,7 +17,7 @@ enum SeventhError {
     Empty,
 }
 
-#[derive(Debug, Eq)]
+#[derive(Debug, Eq, Clone)]
 struct Play {
     hand: String,
     bet: usize,
@@ -31,7 +31,7 @@ impl Ord for Play {
             println!("WARNING, invalid hand {:?}", &self);
         }
 
-        let other_value = rank_hand(self)
+        let other_value = rank_hand(other)
             .unwrap_or((0, vec![0, 0, 0, 0, 0]));
         if other_value == (0, vec![0, 0, 0, 0, 0]) {
             println!("WARNING, invalid hand {:?}", &other);
@@ -40,13 +40,16 @@ impl Ord for Play {
         if self_value.0.eq(&other_value.0) {
             for index in 0..self_value.1.len() {
                 if !self_value.1[index].eq(&other_value.1[index]) {
+                    dbg!(self_value.1[index].cmp(&other_value.1[index]));
                     return self_value.1[index].cmp(&other_value.1[index]);
                 }
             }
 
+            dbg!("Equal");
             return Ordering::Equal;
         }
 
+        dbg!(self_value.0.cmp(&other_value.0));
         self_value.0.cmp(&self_value.0)
     }
 }
@@ -65,7 +68,7 @@ impl PartialEq for Play {
             println!("WARNING, invalid hand {:?}", &self);
         }
 
-        let other_value = rank_hand(self)
+        let other_value = rank_hand(other)
         .unwrap_or((0, vec![0, 0, 0, 0, 0]));
         if other_value == (0, vec![0, 0, 0, 0, 0]) {
             println!("WARNING, invalid hand {:?}", &other);
@@ -157,7 +160,7 @@ fn parse(input: &str) -> Result<Game> {
 
 pub fn first(input: &str) -> Result<usize> {
     let mut game = parse(input)?;
-    game.sort_unstable_by(|a, b| a.cmp(b));
+    game.sort_unstable();
     dbg!(&game);
 
     let mut sum = 0;
