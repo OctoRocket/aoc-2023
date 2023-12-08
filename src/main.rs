@@ -12,7 +12,7 @@ use std::{
 };
 
 fn main() -> Result<()> {
-    let mut file = File::open("example.txt")?;
+    let mut file = File::open("input.txt")?;
     let mut buf = String::new();
     file.read_to_string(&mut buf)?;
 

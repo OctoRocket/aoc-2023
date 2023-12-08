@@ -27,32 +27,21 @@ impl Ord for Play {
     fn cmp(&self, other: &Self) -> Ordering {
         let self_value = rank_hand(self)
             .unwrap_or((0, vec![0, 0, 0, 0, 0]));
-        if self_value == (0, vec![0, 0, 0, 0, 0]) {
-            println!("WARNING, invalid hand {:?}", &self);
-        }
 
         let other_value = rank_hand(other)
             .unwrap_or((0, vec![0, 0, 0, 0, 0]));
-        if other_value == (0, vec![0, 0, 0, 0, 0]) {
-            println!("WARNING, invalid hand {:?}", &other);
-        }
-
-        dbg!(&self.hand, &other.hand);
 
         if self_value.0.eq(&other_value.0) {
             for index in 0..self_value.1.len() {
                 if !self_value.1[index].eq(&other_value.1[index]) {
-                    println!("{} v. {}: {:?}", self_value.1[index], other_value.1[index], self_value.1[index].cmp(&other_value.1[index]));
                     return self_value.1[index].cmp(&other_value.1[index]);
                 }
             }
 
-            dbg!("Equal");
             return Ordering::Equal;
         }
 
-        dbg!(self_value.0.cmp(&other_value.0));
-        self_value.0.cmp(&self_value.0)
+        self_value.0.cmp(&other_value.0)
     }
 }
 
@@ -162,9 +151,7 @@ fn parse(input: &str) -> Result<Game> {
 
 pub fn first(input: &str) -> Result<usize> {
     let mut game = parse(input)?;
-    dbg!(&game);
     game.sort_unstable();
-    dbg!(&game);
 
     let mut sum = 0;
     for rank in 1..=game.len() {
