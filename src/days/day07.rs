@@ -37,10 +37,12 @@ impl Ord for Play {
             println!("WARNING, invalid hand {:?}", &other);
         }
 
+        dbg!(&self.hand, &other.hand);
+
         if self_value.0.eq(&other_value.0) {
             for index in 0..self_value.1.len() {
                 if !self_value.1[index].eq(&other_value.1[index]) {
-                    dbg!(self_value.1[index].cmp(&other_value.1[index]));
+                    println!("{} v. {}: {:?}", self_value.1[index], other_value.1[index], self_value.1[index].cmp(&other_value.1[index]));
                     return self_value.1[index].cmp(&other_value.1[index]);
                 }
             }
@@ -160,6 +162,7 @@ fn parse(input: &str) -> Result<Game> {
 
 pub fn first(input: &str) -> Result<usize> {
     let mut game = parse(input)?;
+    dbg!(&game);
     game.sort_unstable();
     dbg!(&game);
 
