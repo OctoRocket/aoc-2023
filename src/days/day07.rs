@@ -76,16 +76,16 @@ fn get_card_number(card: char) -> Result<usize> {
         'A' => Ok(12), 
         'K' => Ok(11), 
         'Q' => Ok(10), 
-        'J' => Ok( 9), 
-        'T' => Ok( 8), 
-        '9' => Ok( 7), 
-        '8' => Ok( 6), 
-        '7' => Ok( 5), 
-        '6' => Ok( 4), 
-        '5' => Ok( 3), 
-        '4' => Ok( 2), 
-        '3' => Ok( 1), 
-        '2' => Ok( 0),
+        'T' => Ok( 9), 
+        '9' => Ok( 8), 
+        '8' => Ok( 7), 
+        '7' => Ok( 6), 
+        '6' => Ok( 5), 
+        '5' => Ok( 4), 
+        '4' => Ok( 3), 
+        '3' => Ok( 2), 
+        '2' => Ok( 1),
+        'J' => Ok( 0),
         _ => Err(SeventhError::Card(card.to_string()).into())
     }
 }
@@ -99,21 +99,40 @@ fn get_card_number(card: char) -> Result<usize> {
     1: One pair, where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
     0: High card, where all cards' labels are distinct: 23456
 */
-fn determine_hand(cards: &[usize; 13]) -> Result<usize> {
-    let max_card = cards.iter().max().ok_or(SeventhError::Empty)?;
-    
-    if max_card == &5 {
+fn determine_hand(mut cards: Vec<usize>) -> Result<usize> {
+    let mut max_card = cards.iter().max().ok_or(SeventhError::Empty)?.to_owned();
+
+    if max_card == cards[0] {
+        let jokers = cards[0]; // if jokers are the max card
+        cards[0] = 0;
+        max_card = cards.iter().max().ok_or(SeventhError::Empty)?.to_owned();
+
+        let index_of_max = cards.iter().position(|n| n == &max_card).unwrap();
+        cards[index_of_max] += jokers;
+        max_card = cards.iter().max().ok_or(SeventhError::Empty)?.to_owned();
+    } else {
+        for _ in 0..cards[0] { // for each joker
+            cards[0] -= 1;
+            let index_of_max = cards.iter().position(|n| n == &max_card).unwrap();
+            cards[index_of_max] += 1;
+            max_card += 1;
+        }
+    }
+
+    if max_card == 5 {
         return Ok(6);
-    } else if max_card == &4  {
+    } else if max_card == 4  {
         return Ok(5);
-    } else if max_card == &3 && cards.contains(&2) {
+    } else if max_card == 3 && cards.contains(&2) {
         return Ok(4);
-    } else if max_card == &3 {
+    } else if max_card == 3 {
         return Ok(3);
     } else if cards.iter().filter(|v| v == &&2).count() == 2 {
         return Ok(2);
-    } else if max_card == &2 {
-        return Ok(1)
+    } else if max_card == 2 {
+        return Ok(1);
+    } else if max_card > 5 {
+        panic!("Error, over 5 cards accounted for with cards {:?} with {} jokers.", cards, cards[0]);
     }
 
     Ok(0)
@@ -121,7 +140,7 @@ fn determine_hand(cards: &[usize; 13]) -> Result<usize> {
 
 fn rank_hand(input: &Play) -> Result<(usize, Vec<usize>)> {
     let hand = &input.hand;
-    let mut cards = [0; 13];
+    let mut cards = vec![0; 13];
     let mut card_numbers = vec![];
 
     for card in hand.chars() {
@@ -130,7 +149,7 @@ fn rank_hand(input: &Play) -> Result<(usize, Vec<usize>)> {
         card_numbers.push(card_number);
     }
 
-    let hand_value = determine_hand(&cards)?;
+    let hand_value = determine_hand(cards)?;
     
     Ok((hand_value, card_numbers))
 }
@@ -149,9 +168,10 @@ fn parse(input: &str) -> Result<Game> {
     Ok(game)
 }
 
-pub fn first(input: &str) -> Result<usize> {
+pub fn second(input: &str) -> Result<usize> {
     let mut game = parse(input)?;
     game.sort_unstable();
+    // game.iter().enumerate().for_each(|h| println!("{} => {:?}", h.1.hand, rank_hand(h.1)));
 
     let mut sum = 0;
     for rank in 1..=game.len() {
